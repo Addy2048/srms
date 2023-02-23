@@ -9,13 +9,18 @@ if(strlen($_SESSION['alogin'])=="")
     else{
 if(isset($_POST['submit']))
 {
-$marks=array();
+    $cas=array();
+    $fes=array();
 $class=$_POST['class'];
 $studentid=$_POST['studentid']; 
-$mark=$_POST['marks'];
+$ca=$_POST['cas'];
+$fe=$_POST['fes'];
+$semester=$_POST['semester'];
+$academicYear=$_POST['academicyear'];
 
- $stmt = $dbh->prepare("SELECT tblsubjects.SubjectName,tblsubjects.id FROM tblsubjectcombination join  tblsubjects on  tblsubjects.id=tblsubjectcombination.SubjectId WHERE tblsubjectcombination.ClassId=:cid order by tblsubjects.SubjectName");
+ $stmt = $dbh->prepare("SELECT tblsubjects.SubjectName,tblsubjects.id FROM tblsubjectcombination join  tblsubjects on  tblsubjects.id=tblsubjectcombination.SubjectId WHERE tblsubjectcombination.ClassId=:cid AND tblsubjects.semester=:semester order by tblsubjects.SubjectName");
  $stmt->execute(array(':cid' => $class));
+ $stmt->execute(array(':semester' => $semester));
   $sid1=array();
  while($row=$stmt->fetch(PDO::FETCH_ASSOC))
  {
@@ -23,15 +28,18 @@ $mark=$_POST['marks'];
 array_push($sid1,$row['id']);
    } 
   
-for($i=0;$i<count($mark);$i++){
-$mar=$mark[$i];
-$sid=$sid1[$i];
-$sql="INSERT INTO  tblresult(StudentId,ClassId,SubjectId,marks) VALUES(:studentid,:class,:sid,:marks)";
+for($i=0;$i<count($ca);$i++){
+    $c=$ca[$i];
+    $f=$fe[$i];
+  $sid=$sid1[$i];
+$sql="INSERT INTO  tblresult(StudentId,ClassId,SubjectId,ca,fe, academicYear) VALUES(:studentid,:class,:sid,:cas,:fes,:academicYear)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':studentid',$studentid,PDO::PARAM_STR);
 $query->bindParam(':class',$class,PDO::PARAM_STR);
 $query->bindParam(':sid',$sid,PDO::PARAM_STR);
-$query->bindParam(':marks',$mar,PDO::PARAM_STR);
+$query->bindParam(':cas',$c,PDO::PARAM_STR);
+$query->bindParam(':fes',$f,PDO::PARAM_STR);
+$query->bindParam(':academicYear',$academicYear,PDO::PARAM_STR);
 $query->execute();
 $lastInsertId = $dbh->lastInsertId();
 if($lastInsertId)
@@ -101,6 +109,7 @@ var abh=clid+'$'+val;
         }
         });
 }
+
 </script>
 
 
@@ -158,13 +167,13 @@ else if($error){?>
                                             <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
                                         </div>
                                         <?php } ?>
-                                                <form class="form-horizontal" method="post">
+                                                <form class="form-horizontal" method="post" action="">
 
  <div class="form-group">
 <label for="default" class="col-sm-2 control-label">Programme</label>
  <div class="col-sm-10">
  <select name="class" class="form-control clid" id="classid" onChange="getStudent(this.value);" required="required">
-<option value="">Select Programme</option>
+<option value="">Select </option>
 <?php $sql = "SELECT * from tblclasses";
 $query = $dbh->prepare($sql);
 $query->execute();
@@ -178,6 +187,8 @@ foreach($results as $result)
  </select>
                                                         </div>
                                                     </div>
+
+                                                 
 <div class="form-group">
                                                         <label for="date" class="col-sm-2 control-label ">Student Name</label>
                                                         <div class="col-sm-10">
@@ -185,6 +196,15 @@ foreach($results as $result)
                                                     </select>
                                                         </div>
                                                     </div>
+
+                                                    <div class="form-group">
+                                                        <label for="date" class="col-sm-2 control-label ">Academic Year</label>
+                                                        <div class="col-sm-10">
+                                                        <input type="text" name="academicyear" class="form-control" id="default" placeholder="Academic year" required="required">
+                                                   
+                                                        </div>
+                                                    </div>
+
 
                                                     <div class="form-group">
                                                       

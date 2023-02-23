@@ -10,11 +10,13 @@ if(strlen($_SESSION['alogin'])=="")
 if(isset($_POST['submit']))
 {
 $subjectname=$_POST['subjectname'];
-$subjectcode=$_POST['subjectcode']; 
-$sql="INSERT INTO  tblsubjects(SubjectName,SubjectCode) VALUES(:subjectname,:subjectcode)";
+$subjectcode=$_POST['subjectcode'];
+$semester=$_POST['semester'];
+$sql="INSERT INTO  tblsubjects(SubjectName,SubjectCode,semester) VALUES(:subjectname,:subjectcode,:semester)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':subjectname',$subjectname,PDO::PARAM_STR);
 $query->bindParam(':subjectcode',$subjectcode,PDO::PARAM_STR);
+$query->bindParam(':semester',$semester,PDO::PARAM_STR);
 $query->execute();
 $lastInsertId = $dbh->lastInsertId();
 if($lastInsertId)
@@ -112,6 +114,11 @@ else if($error){?>
                                                         <label for="default" class="col-sm-2 control-label">Course Code</label>
                                                         <div class="col-sm-10">
  <input type="text" name="subjectcode" class="form-control" id="default" placeholder="Subject Code" required="required">
+                                                        </div>
+
+                                                        <label for="default" class="col-sm-2 control-label">Semester</label>
+                                                        <div class="col-sm-10">
+ <input type="text" name="semester" class="form-control" id="default" placeholder="Semester eg 1 or 2" required="required">
                                                         </div>
                                                     </div>
                                                     

@@ -56,6 +56,8 @@ include('includes/config.php');
 // code Student Data
 $rollid=$_POST['rollid'];
 $classid=$_POST['class'];
+$academicYear=$_POST['academicYear'];
+$semester=$_POST['semester'];
 $_SESSION['rollid']=$rollid;
 $_SESSION['classid']=$classid;
 $qery = "SELECT   tblstudents.StudentName,tblstudents.RollId,tblstudents.RegDate,tblstudents.StudentId,tblstudents.Status,tblclasses.ClassName,tblclasses.Section from tblstudents join tblclasses on tblclasses.id=tblstudents.ClassId where tblstudents.RollId=:rollid and tblstudents.ClassId=:classid ";
@@ -70,8 +72,10 @@ if($stmt->rowCount() > 0)
 foreach($resultss as $row)
 {   ?>
 <p><b>Student Name :</b> <?php echo htmlentities($row->StudentName);?></p>
-<p><b>Registration Number :</b> <?php echo htmlentities($row->RollId);?>
-<p><b>Programme:</b> <?php echo htmlentities($row->ClassName);?>(<?php echo htmlentities($row->Section);?>)
+<p><b>Registration Number :</b> <?php echo htmlentities($row->RollId);?></p>
+<p><b>Programme:</b> <?php echo htmlentities($row->ClassName);?>(<?php echo htmlentities($row->Section);?>)</p>
+<p><b>Semester :</b> <?php echo $semester;?></p>
+<p><b>Academic Year :</b> <?php echo $academicYear;?></p>
 <?php }
 
     ?>
@@ -88,8 +92,10 @@ foreach($resultss as $row)
                                                 <thead>
                                                         <tr style="text-align: center">
                                                             <th style="text-align: center">#</th>
-                                                            <th style="text-align: center"> Subject</th>    
-                                                            <th style="text-align: center">Score</th>
+                                                            <th style="text-align: center">Course</th>    
+                                                            <th style="text-align: center">CA</th>
+                                                            <th style="text-align: center">FE</th>
+                                                            <th style="text-align: center">Total</th>
                                                             <th style="text-align: center">Grade</th>
                                                             
                                                         </tr>
@@ -102,13 +108,16 @@ foreach($resultss as $row)
 <?php                                              
 // Code for result
 
- $query ="select t.StudentName,t.RollId,t.ClassId,t.marks,SubjectId,tblsubjects.SubjectName from (select sts.StudentName,sts.RollId,sts.ClassId,tr.marks,SubjectId from tblstudents as sts join  tblresult as tr on tr.StudentId=sts.StudentId) as t join tblsubjects on tblsubjects.id=t.SubjectId where (t.RollId=:rollid and t.ClassId=:classid)";
+$query ="select t.StudentName,t.RollId,t.ClassId,t.ca,t.fe,SubjectId,tblsubjects.SubjectName , tblsubjects.semester, t.academicYear from (select sts.StudentName,sts.RollId,sts.ClassId,tr.ca,tr.fe,SubjectId, tr.academicYear from tblstudents as sts join  tblresult as tr on tr.StudentId=sts.StudentId) as t join tblsubjects on tblsubjects.id=t.SubjectId where (t.RollId=:rollid and t.ClassId=:classid and tblsubjects.semester=:semester)";
 $query= $dbh -> prepare($query);
 $query->bindParam(':rollid',$rollid,PDO::PARAM_STR);
 $query->bindParam(':classid',$classid,PDO::PARAM_STR);
+$query->bindParam(':semester',$semester,PDO::PARAM_STR);
 $query-> execute();  
 $results = $query -> fetchAll(PDO::FETCH_OBJ);
 $cnt=1;
+$gpaCnt=0;
+$gpaNo=0;
 if($countrow=$query->rowCount()>0)
 { 
 foreach($results as $result){
@@ -118,24 +127,27 @@ foreach($results as $result){
                                                 		<tr>
 <th scope="row" style="text-align: center"><?php echo htmlentities($cnt);?></th>
 <td style="text-align: center"><?php echo htmlentities($result->SubjectName);?></td>
-<td style="text-align: center"><?php echo htmlentities($totalmarks=$result->marks);?></td>
-<td style="text-align: center"><?php if ($totalmarks=$result->marks >= 70) { echo "A";}
-else if ($totalmarks=$result->marks >= 60 && $totalmarks=$result->marks  < 70) { echo "B+";}
-else if ($totalmarks=$result->marks >= 50 && $totalmarks=$result->marks  < 60) { echo "B";}
-else if ($totalmarks=$result->marks >= 40 && $totalmarks=$result->marks  < 50) { echo "B+";}
-else if ($totalmarks=$result->marks >= 0 && $totalmarks=$result->marks  < 40) { echo "B+";}?></td>
+<td style="text-align: center"><?php echo htmlentities($result->ca);?></td>
+<td style="text-align: center"><?php echo htmlentities($result->fe);?></td>
+<td style="text-align: center"><?php echo $result->fe+$result->ca ?></td>
+<td style="text-align: center"><?php if($result->fe+$result->ca >=70) {$gpaCnt=$gpaCnt+5; echo "A";}
+if($result->fe+$result->ca >=60 && $result->fe+$result->ca <70 ) {$gpaCnt=$gpaCnt+4; echo "B+";}
+if($result->fe+$result->ca >=50 && $result->fe+$result->ca <60 ) {$gpaCnt=$gpaCnt+3.5; echo "B";}
+if($result->fe+$result->ca >=40 && $result->fe+$result->ca <50 ) {$gpaCnt=$gpaCnt+2; echo "C";}
+if($result->fe+$result->ca  <40) {$gpaCnt=$gpaCnt+1; echo "F";} ?></td>
                                                 		</tr>
 <?php 
-$totlcount+=$totalmarks;
-$cnt++;}
+// $totlcount+=$totalmarks;
+$cnt++;
+$gpaNo++;}
 ?>
 <!-- <tr>
 <th scope="row" colspan="2" style="text-align: center">Total Marks</th>
 <td style="text-align: center"><b><?php echo htmlentities($totlcount); ?></b> out of <b><?php echo htmlentities($outof=($cnt-1)*100); ?></b></td>
                                                         </tr> -->
 <tr>
-<th scope="row" colspan="2" style="text-align: center">GPA</th>           
-<td style="text-align: center"><b>Not Calculated</b></td>
+<th scope="row" colspan="5" style="text-align: center">GPA</th>           
+<td style="text-align: center"><b><?php echo round($gpaCnt/$gpaNo,2); ?></b></td>
 </tr>
 
 <tr>

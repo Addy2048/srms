@@ -35,7 +35,9 @@ if(!empty($_POST["classid1"]))
  
  while($row=$stmt->fetch(PDO::FETCH_ASSOC))
  {?>
-  <p> <?php echo htmlentities($row['SubjectName']); ?><input type="text"  name="marks[]" value="" class="form-control" required="" placeholder="Enter marks out of 100" autocomplete="off"></p>
+  <p> <?php echo htmlentities($row['SubjectName']); ?><input type="text"  name="cas[]" value="" class="form-control" required="" placeholder="CA" autocomplete="off">
+  <input type="text"  name="fes[]" value="" class="form-control" required="" placeholder="FE" autocomplete="off">
+  </p>
   
 <?php  }
 }

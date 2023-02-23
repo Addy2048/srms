@@ -54,6 +54,15 @@ foreach($results as $result)
  </select>
 </div>
 
+<div class="form-group">
+                                		<label for="rollid">Academic Year</label>
+                                        <input type="text" class="form-control" id="" placeholder="Academic Year" autocomplete="off" name="academicYear">
+                                	</div>
+
+                                    <div class="form-group">
+                                		<label for="rollid">Semester</label>
+                                        <input type="text" class="form-control" id="" placeholder="Semester" autocomplete="off" name="semester">
+                                	</div>
     
                                     <div class="form-group mt-20">
                                         <div class="">
