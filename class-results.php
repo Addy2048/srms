@@ -75,6 +75,7 @@ include('includes/config.php');
                                                 <table class="table table-hover table-bordered" border="1" width="100%">
                                                 <thead>
                                                         <tr style="text-align: center">
+                                                            <th style="text-align: center">#</th>
                                                             <th style="text-align: center">Reg#</th>
                                                             <?php
                                                             $query="SELECT * FROM tblsubjectcombination JOIN tblsubjects on tblsubjectcombination.SubjectId = tblsubjects.id WHERE ClassId=:classid";
@@ -85,7 +86,7 @@ include('includes/config.php');
                                                             
                                                             foreach($results as $result){
                                                                 ?>
-                                                                <th style="text-align: center"><h6><b><?php echo htmlentities($result->SubjectCode);  ?></b></h6><div style="width:100%; display: flex; justify-content: space-around"><span>CA</span><span>FE</span><span>Grade</span></div></th> 
+                                                                <th style="text-align: center"><h6><b><?php echo htmlentities($result->SubjectCode);  ?></b></h6><div style="width:100%; display: flex; justify-content: space-around"><span>CA</span><span>FE</span><span>GD</span></div></th> 
                                                                 <?php
                                                                 // echo $result->SubjectCode;
                                                             }
@@ -113,6 +114,7 @@ foreach($results as $result){
     $id=$result->StudentId
     ?>
                                                		<tr>
+<th scope="row" style="text-align: center"><?php echo htmlentities($cnt);?></th>
 <th scope="row" style="text-align: center"><?php echo htmlentities($result->RollId);?></th>
 <?php
 $query="SELECT * FROM tblresult where StudentId=:id";
@@ -122,21 +124,32 @@ $query-> execute();
 $results = $query -> fetchAll(PDO::FETCH_OBJ);
 $gpaCnt=0;
 $gpaNo=0;
+$semesterStatus = 'Pass';
 foreach($results as $result){
 ?>
 <td style="text-align: center"><div style="display: flex; justify-content: space-around"><span><?php echo htmlentities($result->ca); ?></span><span><?php echo htmlentities($result->fe); ?></span><span><?php if($result->fe+$result->ca >=70) {$gpaCnt=$gpaCnt+5; echo "A";}
 if($result->fe+$result->ca >=60 && $result->fe+$result->ca <70 ) {$gpaCnt=$gpaCnt+4; echo "B+";}
 if($result->fe+$result->ca >=50 && $result->fe+$result->ca <60 ) {$gpaCnt=$gpaCnt+3.5; echo "B";}
-if($result->fe+$result->ca >=40 && $result->fe+$result->ca <50 ) {$gpaCnt=$gpaCnt+2; echo "C";}
-if($result->fe+$result->ca  <40) {$gpaCnt=$gpaCnt+1; echo "F";} ?></span></div></td>                                                		
+if($result->fe+$result->ca >=40 && $result->fe+$result->ca <50 ) {$gpaCnt=$gpaCnt+2; echo "C"; }
+if($result->fe+$result->ca  <40) {$gpaCnt=$gpaCnt+1; echo "F"; } 
+if ($result->ca < 24) {
+    $semesterStatus = 'Retake';
+}
+
+if ($result->fe < 24 && $semesterStatus !== 'Retake'){
+    $semesterStatus = 'Sup';
+}
+
+?></span></div></td>
 <?php
 $gpaNo++;
 }
 ?>
 <td style="text-align: center"><?php echo round($gpaCnt/$gpaNo,2); ?></td>
-<td style="text-align: center">Pass</td>
+<td style="text-align: center"><?php if(round($gpaCnt/$gpaNo,2)<=1.8){ echo"Discontinued";} else{ echo $semesterStatus;} ?></td>
 </tr>
 <?php
+$cnt++;
 }
 ?>
 
@@ -160,6 +173,20 @@ $gpaNo++;
 
                                                 	</tbody>
                                                 </table>
+                                                <h6>Key</h6>
+                                                <?php
+                                                 $query="SELECT * FROM tblsubjectcombination JOIN tblsubjects on tblsubjectcombination.SubjectId = tblsubjects.id WHERE ClassId=:classid";
+                                                 $query= $dbh -> prepare($query);
+                                                 $query->bindParam(':classid',$classid,PDO::PARAM_STR);
+                                                 $query-> execute();  
+                                                 $results = $query -> fetchAll(PDO::FETCH_OBJ);
+
+                                                 foreach($results as $result){
+                                                    ?>
+                                                    <p><?php echo $result->SubjectCode ?>-><?php echo $result->SubjectName ?></p>
+                                                    <?php
+                                                 }
+                                                ?>
 
                                             </div>
                                         </div>

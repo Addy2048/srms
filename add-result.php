@@ -9,8 +9,8 @@ if(strlen($_SESSION['alogin'])=="")
     else{
 if(isset($_POST['submit']))
 {
-    $cas=array();
-    $fes=array();
+$cas=array();
+$fes=array();
 $class=$_POST['class'];
 $studentid=$_POST['studentid']; 
 $ca=$_POST['cas'];
@@ -19,8 +19,8 @@ $semester=$_POST['semester'];
 $academicYear=$_POST['academicyear'];
 
  $stmt = $dbh->prepare("SELECT tblsubjects.SubjectName,tblsubjects.id FROM tblsubjectcombination join  tblsubjects on  tblsubjects.id=tblsubjectcombination.SubjectId WHERE tblsubjectcombination.ClassId=:cid AND tblsubjects.semester=:semester order by tblsubjects.SubjectName");
- $stmt->execute(array(':cid' => $class));
- $stmt->execute(array(':semester' => $semester));
+ $stmt->execute(array(':cid' => $class, ':semester' => $semester));
+//  $stmt->execute(array(':semester' => $semester));
   $sid1=array();
  while($row=$stmt->fetch(PDO::FETCH_ASSOC))
  {
@@ -32,13 +32,13 @@ for($i=0;$i<count($ca);$i++){
     $c=$ca[$i];
     $f=$fe[$i];
   $sid=$sid1[$i];
-$sql="INSERT INTO  tblresult(StudentId,ClassId,SubjectId,ca,fe, academicYear) VALUES(:studentid,:class,:sid,:cas,:fes,:academicYear)";
+$sql="INSERT INTO  tblresult(StudentId,ClassId,SubjectId,ca,fe,academicYear) VALUES(:studentid,:class,:sid,:c,:f,:academicYear)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':studentid',$studentid,PDO::PARAM_STR);
 $query->bindParam(':class',$class,PDO::PARAM_STR);
 $query->bindParam(':sid',$sid,PDO::PARAM_STR);
-$query->bindParam(':cas',$c,PDO::PARAM_STR);
-$query->bindParam(':fes',$f,PDO::PARAM_STR);
+$query->bindParam(':c',$c,PDO::PARAM_STR);
+$query->bindParam(':f',$f,PDO::PARAM_STR);
 $query->bindParam(':academicYear',$academicYear,PDO::PARAM_STR);
 $query->execute();
 $lastInsertId = $dbh->lastInsertId();
@@ -167,7 +167,7 @@ else if($error){?>
                                             <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
                                         </div>
                                         <?php } ?>
-                                                <form class="form-horizontal" method="post" action="">
+                                                <form class="form-horizontal" method="post">
 
  <div class="form-group">
 <label for="default" class="col-sm-2 control-label">Programme</label>

@@ -66,7 +66,6 @@ if($query -> rowCount() > 0)
 <p>
 <?php
 echo "<span style='color:red'> Result Already Declare .</span>";
- echo "<script>$('#submit').prop('disabled',true);</script>";
  ?></p>
 <?php }
 

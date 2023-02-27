@@ -118,6 +118,7 @@ $results = $query -> fetchAll(PDO::FETCH_OBJ);
 $cnt=1;
 $gpaCnt=0;
 $gpaNo=0;
+$semesterStatus = 'Pass';
 if($countrow=$query->rowCount()>0)
 { 
 foreach($results as $result){
@@ -138,6 +139,13 @@ if($result->fe+$result->ca  <40) {$gpaCnt=$gpaCnt+1; echo "F";} ?></td>
                                                 		</tr>
 <?php 
 // $totlcount+=$totalmarks;
+if ($result->ca < 24) {
+    $semesterStatus = 'Retake';
+}
+
+if ($result->fe < 24 && $semesterStatus !== 'Retake'){
+    $semesterStatus = 'Sup';
+}
 $cnt++;
 $gpaNo++;}
 ?>
@@ -148,6 +156,10 @@ $gpaNo++;}
 <tr>
 <th scope="row" colspan="5" style="text-align: center">GPA</th>           
 <td style="text-align: center"><b><?php echo round($gpaCnt/$gpaNo,2); ?></b></td>
+</tr>
+<tr>
+<th scope="row" colspan="5" style="text-align: center">Status</th>           
+<td style="text-align: center"><b><?php echo $semesterStatus; ?></b></td>
 </tr>
 
 <tr>

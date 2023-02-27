@@ -4,12 +4,14 @@ error_reporting(0);
 include('includes/config.php');
 if($_SESSION['alogin']!=''){
 $_SESSION['alogin']='';
+$_SESSION['arole']='';
+$_SESSION['aname']='';
 }
 if(isset($_POST['login']))
 {
 $uname=$_POST['username'];
 $password=$_POST['password'];
-$sql ="SELECT UserName,Password FROM admin WHERE UserName=:uname and Password=:password";
+$sql ="SELECT * FROM admin WHERE StaffId=:uname and Password=:password";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':uname', $uname, PDO::PARAM_STR);
 $query-> bindParam(':password', $password, PDO::PARAM_STR);
@@ -68,15 +70,15 @@ echo "<script type='text/javascript'> document.location = 'dashboard.php'; </scr
 
                                                     <form class="form-horizontal" method="post">
                                                     	<div class="form-group">
-                                                    		<label for="inputEmail3" class="col-sm-2 control-label">Username</label>
+                                                    		<label for="inputEmail3" class="col-sm-2 control-label">ID</label>
                                                     		<div class="col-sm-10">
-                                                    			<input type="text" name="username" class="form-control" id="inputEmail3" placeholder="UserName">
+                                                    			<input type="text" name="username" class="form-control" id="inputEmail3" placeholder="ID or email" autocomplete="off">
                                                     		</div>
                                                     	</div>
                                                     	<div class="form-group">
                                                     		<label for="inputPassword3" class="col-sm-2 control-label">Password</label>
                                                     		<div class="col-sm-10">
-                                                    			<input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password">
+                                                    			<input type="password" name="password" class="form-control" id="inputPassword3" placeholder="Password" autocomplete="off">
                                                     		</div>
                                                     	</div>
                                                     
